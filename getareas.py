@@ -1,4 +1,4 @@
-from itvsc.config import headers
+from config import headers
 import datetime
 import requests
 
