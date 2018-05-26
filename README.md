@@ -1,2 +1,2 @@
-# HH-VSC
+# IT-VSC
 VacancyStatCounter
