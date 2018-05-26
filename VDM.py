@@ -3,6 +3,10 @@ import logging
 import datetime
 
 
+class SetVacancyDataException(ValueError):
+    pass
+
+
 class Specialization:
     def __init__(self, name: str, value: float) -> None:
         self.__name = name
@@ -35,10 +39,6 @@ class Area:
     @property
     def number(self):
         return self.__number
-
-
-class SetVacancyDataException(ValueError):
-    pass
 
 
 class Vacancy:
@@ -101,11 +101,11 @@ class Vacancy:
         self._specialization = value
 
 
-class VDMConfig:
+class VDSConfig:
     logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
                         level=logging.DEBUG)
 
-    app_name = 'IT-VSC'
+    app_name = 'VDS'
     app_version = '0.1'
     app_email = 'alexeysvetlov92@gmail.com'
     headers = {'user-agent': f'{app_name}/{app_version} ({app_email})'}
@@ -122,18 +122,18 @@ class VDMConfig:
 
 
 if __name__ == '__main__':
-    vacancy = Vacancy(25886815, VDMConfig.area_ids[0], VDMConfig.specializations_ids[0])
+    vacancy = Vacancy(25886815, VDSConfig.area_ids[0], VDSConfig.specializations_ids[0])
     print(vacancy)
-    response = get(vacancy.url, headers=VDMConfig.headers)
+    response = get(vacancy.url, headers=VDSConfig.headers)
     vacancy.data = response.json()
     print(vacancy)
 
-    response = get('https://api.hh.ru/areas', headers=VDMConfig.headers)
+    response = get('https://api.hh.ru/areas', headers=VDSConfig.headers)
     with open(f"{str(datetime.datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}"
               f"areas.txt", mode="w+", encoding="UTF8") as file:
         file.write(response.text)
 
-    response = get('https://api.hh.ru/specializations', headers=VDMConfig.headers)
+    response = get('https://api.hh.ru/specializations', headers=VDSConfig.headers)
     with open(f"{str(datetime.datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}"
               f"specializations.txt", mode="w+", encoding="UTF8") as file:
         file.write(response.text)
