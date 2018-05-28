@@ -101,19 +101,29 @@ class Vacancy:
         self._specialization = value
 
 
-class InformationGuide:
+class Actions:
+    @staticmethod
+    def parsing_data():
+        vacancy = Vacancy(25886815, VDMConfig.area_ids[0], VDMConfig.specializations_ids[0])
+        response = get(vacancy.url, headers=VDMConfig.HEADERS)
+        vacancy.data = response.json()
+        logging.info(vacancy)
+
+        """https://api.hh.ru/vacancies?area=1&specialization=1.117&page=0&per_page=1&no_magic=true"""
+        pass
+
     @staticmethod
     def get_areas():
-        res = get('https://api.hh.ru/areas', headers=VDMConfig.headers)
-        with open(f"{str(datetime.datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}"
-                  f"areas.txt", mode="w+", encoding="UTF8") as file:
+        res = get('https://api.hh.ru/areas', headers=VDMConfig.HEADERS)
+        with open(f"areas{str(datetime.datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}.txt",
+                  mode="w+", encoding="UTF8") as file:
             file.write(res.text)
 
     @staticmethod
     def get_specializations():
-        res = get('https://api.hh.ru/specializations', headers=VDMConfig.headers)
-        with open(f"{str(datetime.datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}"
-                  f"specializations.txt", mode="w+", encoding="UTF8") as file:
+        res = get('https://api.hh.ru/specializations', headers=VDMConfig.HEADERS)
+        with open(f"specializations{str(datetime.datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}"
+                  f".txt", mode="w+", encoding="UTF8") as file:
             file.write(res.text)
 
 
@@ -131,6 +141,9 @@ def parse_args():
     parser.add_argument("-tps", "--threadpoolsize", type=int, default=4,
                         help='Set thread pool size. '
                              '(4 threads as default)')
+    parser.add_argument("-lfn", "--logfilename", type=str, default='vds.log',
+                        help='Set custom log file name. \n'
+                             '(vds.log as default)')
     parser.add_argument("-d", "--debug", type=bool, default=False,
                         help='If True, logging level will be debug. \n'
                              '(False as default)')
@@ -138,14 +151,12 @@ def parse_args():
 
 
 class VDMConfig:
-    app_name = 'VDS'
+    APP_NAME = 'VDS'
     __version__ = '0.0.1'
-    app_email = 'alexeysvetlov92@gmail.com'
-    headers = {'user-agent': f'{app_name}/{__version__} ({app_email})'}
+    APP_EMAIL = 'alexeysvetlov92@gmail.com'
+    HEADERS = {'user-agent': f'{APP_NAME}/{__version__} ({APP_EMAIL})'}
 
-    logger_str_format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
-    logger_level = logging.DEBUG
-    logger_file_name = f"vdm{str(datetime.datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}.log"
+    LOGGER_STR_FORMAT = u'%(filename)s[LINE:%(lineno)d] Level:%(levelname)-8s [%(asctime)s]  %(message)s'
     area_ids: list = [
         Area('Moscow', 1),
     ]
@@ -157,15 +168,27 @@ class VDMConfig:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format=VDMConfig.logger_str_format,
-                        level=VDMConfig.logger_level,
-                        filename=VDMConfig.logger_file_name)
-    print(parse_args())
-
-    # vacancy = Vacancy(25886815, VDMConfig.area_ids[0], VDMConfig.specializations_ids[0])
-    # print(vacancy)
-    # response = get(vacancy.url, headers=VDMConfig.headers)
-    # vacancy.data = response.json()
-    # print(vacancy)
-
-    """https://api.hh.ru/vacancies?area=1&specialization=1.117&page=0&per_page=1&no_magic=true"""
+    args = parse_args()
+    logger_level = None
+    if args.debug is True:
+        logger_level = logging.DEBUG
+    else:
+        logger_level = logging.INFO
+    logging.basicConfig(format=VDMConfig.LOGGER_STR_FORMAT,
+                        level=logger_level,
+                        filename=args.logfilename)
+    logging.debug(args)
+    logging.info('Starting vds...')
+    if args.action is 'parsing':
+        logging.info('Parsing data...')
+        Actions.parsing_data()
+        logging.info('Parsing data complete')
+    elif args.action is 'areas':
+        logging.info('Getting areas data...')
+        Actions.get_areas()
+        logging.info('Getting areas data complete')
+    elif args.action is 'specializations':
+        logging.info('Getting specializations data...')
+        Actions.get_specializations()
+        logging.info('Getting specializations data complete')
+    logging.info('Stopping vds')
