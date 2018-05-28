@@ -1,4 +1,5 @@
 from requests import get
+from argparse import ArgumentParser
 import logging
 import datetime
 
@@ -102,7 +103,7 @@ class Vacancy:
 
 class InformationGuide:
     @staticmethod
-    def get_response():
+    def get_areas():
         res = get('https://api.hh.ru/areas', headers=VDMConfig.headers)
         with open(f"{str(datetime.datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}"
                   f"areas.txt", mode="w+", encoding="UTF8") as file:
@@ -116,11 +117,31 @@ class InformationGuide:
             file.write(res.text)
 
 
+def parse_args():
+    parser = ArgumentParser(description='Vacancies data scrapper script.')
+    parser.add_argument("-a", "--action", type=str, default='parsing',
+                        help='Type of action\n'
+                             'Options: parsing|areas|specializations\n'
+                             'parsing - this is main action and this set as default.\n'
+                             'areas - allows you to get areas info\n'
+                             'specializations - allows you to get specializations info')
+    parser.add_argument("-i", "--interval", type=int, default=60,
+                        help='Set interval rate for parse data'
+                             '(60 minutes as default)')
+    parser.add_argument("-tps", "--threadpoolsize", type=int, default=4,
+                        help='Set thread pool size. '
+                             '(4 threads as default)')
+    parser.add_argument("-d", "--debug", type=bool, default=False,
+                        help='If True, logging level will be debug. \n'
+                             '(False as default)')
+    return parser.parse_args()
+
+
 class VDMConfig:
     app_name = 'VDS'
-    app_version = '0.1'
+    __version__ = '0.0.1'
     app_email = 'alexeysvetlov92@gmail.com'
-    headers = {'user-agent': f'{app_name}/{app_version} ({app_email})'}
+    headers = {'user-agent': f'{app_name}/{__version__} ({app_email})'}
 
     logger_str_format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logger_level = logging.DEBUG
@@ -139,10 +160,12 @@ if __name__ == '__main__':
     logging.basicConfig(format=VDMConfig.logger_str_format,
                         level=VDMConfig.logger_level,
                         filename=VDMConfig.logger_file_name)
-    vacancy = Vacancy(25886815, VDMConfig.area_ids[0], VDMConfig.specializations_ids[0])
-    print(vacancy)
-    response = get(vacancy.url, headers=VDMConfig.headers)
-    vacancy.data = response.json()
-    print(vacancy)
+    print(parse_args())
+
+    # vacancy = Vacancy(25886815, VDMConfig.area_ids[0], VDMConfig.specializations_ids[0])
+    # print(vacancy)
+    # response = get(vacancy.url, headers=VDMConfig.headers)
+    # vacancy.data = response.json()
+    # print(vacancy)
 
     """https://api.hh.ru/vacancies?area=1&specialization=1.117&page=0&per_page=1&no_magic=true"""
