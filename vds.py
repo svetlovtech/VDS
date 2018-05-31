@@ -1,10 +1,11 @@
-from multiprocessing.dummy import Pool
+from concurrent.futures import ThreadPoolExecutor
 from argparse import ArgumentParser
 from requests import get
 from typing import List
-from tqdm import tqdm
 import logging
 import datetime
+
+from tqdm import tqdm
 
 APP_NAME = 'VDS'
 __version__ = '0.0.1'
@@ -13,7 +14,18 @@ HEADERS = {'user-agent': f'{APP_NAME}/{__version__} ({APP_EMAIL})'}
 LOGGER_STR_FORMAT = u'%(filename)s[LINE:%(lineno)d] Level:%(levelname)-8s [%(asctime)s]  %(message)s'
 area_ids: list = [1]
 specializations_ids: list = [1.395, 1.117, 1.221]
-progressbar = None
+
+
+def get_vacancy_data(vacancy_url: str, progressbar_ref: tqdm):
+    bad_chars = ['\u2212', '\u2015', '\u200b', '\xe9', '\u2219', '\u25aa', '\u3000', '\ufeff', '\u2011', '\u200e',
+                 '\ufb01', '\u0306', '\uff0c', '\u2713']
+    response = get(vacancy_url, headers=HEADERS)
+    text = response.text.lower()
+    for char in bad_chars:
+        text = text.replace(char, '')
+    logging.info(text)
+    progressbar_ref.update(1)
+
 
 
 def get_vacancies_list(area_id: int, specialization_number: float) -> List[str]:
@@ -35,12 +47,6 @@ def get_vacancies_list(area_id: int, specialization_number: float) -> List[str]:
         else:
             page_number += 1
     return vacancies_list
-
-
-def get_vacancy_data(url: str):
-    response = get(url, headers=HEADERS)
-    logging.info(response.text)
-    progressbar.update(1)
 
 
 def get_areas():
@@ -96,27 +102,28 @@ if __name__ == '__main__':
     logging.info('Starting vds...')
     if args.action is 'parsing':
         logging.info('Parsing data...')
+        print('Parsing data...')
         all_vacancies: List[str] = []
         for area_number in area_ids:
             for spec_number in specializations_ids:
-                for vacancy_url in get_vacancies_list(area_id=area_number, specialization_number=spec_number):
-                    all_vacancies.append(vacancy_url)
+                for url in get_vacancies_list(area_id=area_number, specialization_number=spec_number):
+                    all_vacancies.append(url)
         unique_vacancies = set()
-        for vacancy_url in all_vacancies:
-            unique_vacancies.add(vacancy_url)
+        for url in all_vacancies:
+            unique_vacancies.add(url)
         logging.info(f'Statistic: all_vacancies {len(all_vacancies)}, unique_vacancies {len(unique_vacancies)}')
         print(f'Statistic: all_vacancies {len(all_vacancies)}, unique_vacancies {len(unique_vacancies)}')
         logging.debug('all_vacancies' + str(all_vacancies))
         logging.debug('unique_vacancies' + str(unique_vacancies))
         logging.info(f'Parsing data complete.')
+        print(f'Parsing data complete.')
 
         progressbar = tqdm(total=len(unique_vacancies))
-        pool = Pool(args.threadpoolsize)
-        pool.map(get_vacancy_data, unique_vacancies)
-        pool.close()
-        pool.join()
+        with ThreadPoolExecutor(max_workers=args.threadpoolsize) as executor:
+            for url in unique_vacancies:
+                executor.submit(get_vacancy_data, url, progressbar)
+            executor.shutdown()
         progressbar.close()
-
     elif args.action is 'areas':
         logging.info('Getting areas data...')
         get_areas()
