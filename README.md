@@ -1,2 +1,2 @@
-# HH-VSC
-VacancyStatCounter
+# VDS
+Vacancy data scrapper
