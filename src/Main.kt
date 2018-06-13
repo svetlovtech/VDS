@@ -1,6 +1,5 @@
 import org.pmw.tinylog.Logger
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -12,7 +11,7 @@ fun main(args: Array<String>) {
             interval = properties.getProperty("interval").toInt(),
             threadPoolSize = properties.getProperty("threadPoolSize").toInt(),
             logFile = properties.getProperty("logFile"),
-            isDebug = properties.getProperty("isDebug").toBoolean(),
+            isDebug = properties.getProperty("isDebug")!!.toBoolean(),
             areaIDs = properties.getProperty("areaIDs").split(","),
             specializationsIDs = properties.getProperty("specializationsIDs").split(","),
             appName = properties.getProperty("appName"),

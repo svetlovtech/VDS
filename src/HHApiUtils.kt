@@ -5,7 +5,6 @@ import org.pmw.tinylog.Logger
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
 class HHApiUtils(private val settings: Settings) {
     private val defaultDateTimeFormat = SimpleDateFormat("yyyyMMdd_HHmmss")

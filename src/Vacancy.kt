@@ -1,5 +1,4 @@
 import com.mashape.unirest.http.Unirest
-import org.pmw.tinylog.Logger
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -10,10 +9,10 @@ class Vacancy(private val url: String,
               private val dataFile: File) : Runnable {
     private val timeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     override fun run() {
-        val responce = Unirest
+        val response = Unirest
                 .get(url)
                 .headers(settings.defaultHeaders).asJson()
-        dataFile.appendText("${timeFormat.format(currentDateTime)} Vacancy: ${responce.body.toString().toLowerCase()}\n")
+        dataFile.appendText("${timeFormat.format(currentDateTime)} Vacancy: ${response.body.toString().toLowerCase()}\n")
         StatCounter.incrementVacancyPoint()
     }
 }
