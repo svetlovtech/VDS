@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="org.tinylog:jcl-binding:1.3.5" type="repository">
+    <properties maven-id="org.tinylog:jcl-binding:1.3.5" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/tinylog/jcl-binding/1.3.5/jcl-binding-1.3.5.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/tinylog/tinylog/1.3.5/tinylog-1.3.5.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/commons-logging/commons-logging/1.2/commons-logging-1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
