@@ -1,5 +1,6 @@
 import org.pmw.tinylog.Logger
 import java.io.File
+import java.lang.System.exit
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -22,29 +23,25 @@ fun main(args: Array<String>) {
     val dataFileName = File(properties.getProperty("dataFileName"))
     Logger.info("Creating data file (${dataFileName.name})...")
     dataFileName.createNewFile()
-    while (true){
-        Logger.info("Parsing data ...")
-        val currentDateTime = Date()
-        val api = HHApiUtils(settings)
-        api.getAreas(currentDateTime)
-        api.getSpecializations(currentDateTime)
-        val vacanciesUrls = api.getVacanciesList(currentDateTime)
-        val vacanciesList = ArrayList<Vacancy>()
-        for (url in vacanciesUrls) {
-            vacanciesList.add(Vacancy(url, settings, currentDateTime, dataFileName))
-        }
-        val threadPool = Executors.newFixedThreadPool(settings.threadPoolSize)
-        for (vacancy in vacanciesList) {
-            threadPool.submit(vacancy)
-        }
-        threadPool.shutdown()
-        while (!threadPool.isTerminated) {
-            Thread.sleep(1000)
-            Logger.info("$StatCounter from ${vacanciesList.size}")
-        }
-        StatCounter.clearAll()
-        Logger.info("Parsing data complete")
-        Thread.sleep((1000 * settings.interval).toLong())
+    Logger.info("Parsing data ...")
+    val currentDateTime = Date()
+    val api = HHApiUtils(settings)
+    api.getAreas(currentDateTime)
+    api.getSpecializations(currentDateTime)
+    val vacanciesUrls = api.getVacanciesList()
+    val vacanciesList = ArrayList<Vacancy>()
+    for (url in vacanciesUrls) {
+        vacanciesList.add(Vacancy(url, settings, currentDateTime, dataFileName))
     }
-
+    val threadPool = Executors.newFixedThreadPool(settings.threadPoolSize)
+    for (vacancy in vacanciesList) {
+        threadPool.submit(vacancy)
+    }
+    threadPool.shutdown()
+    while (!threadPool.isTerminated) {
+        Thread.sleep(1000)
+        Logger.info("$StatCounter from ${vacanciesList.size}")
+    }
+    StatCounter.clearAll()
+    Logger.info("Parsing data complete")
 }

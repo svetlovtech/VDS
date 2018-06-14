@@ -30,7 +30,7 @@ class HHApiUtils(private val settings: Settings) {
         specFile.appendText(response.body.toString())
     }
 
-    fun getVacanciesList(currentDateTime: Date): Set<String> {
+    fun getVacanciesList(): Set<String> {
         val vacanciesUrlArray = ArrayList<String>()
         for (area in settings.areaIDs) {
             Logger.info("Getting URL from area $area")
