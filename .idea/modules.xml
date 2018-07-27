@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/HH-VSC.iml" filepath="$PROJECT_DIR$/.idea/HH-VSC.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/VDS.iml" filepath="$PROJECT_DIR$/.idea/VDS.iml" />
+      <module fileurl="file://$PROJECT_DIR$/VDS.iml" filepath="$PROJECT_DIR$/VDS.iml" />
     </modules>
   </component>
 </project>

@@ -1,0 +1,11 @@
+interval=1440
+threadPoolSize=16
+logFile=./vdslogs.txt
+dataFileName=./vdsdata.txt
+isDebug=false
+areaIDs=1
+specializationsIDs=1.395,1.117,1.221
+
+appName=VDS
+version=20180601
+appEmail=alexeysvetlov92@gmail.com
