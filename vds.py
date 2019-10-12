@@ -27,6 +27,15 @@ ELASTIC_SEARCH_PASSWORD = 'admin'
 ELASTIC_AUTH = HTTPBasicAuth(ELASTIC_SEARCH_LOGIN, ELASTIC_SEARCH_PASSWORD)
 
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="[%(asctime)s] %(levelname)-12s|process:%(process)-5s|thread:%(thread)-5s|funcName:%(funcName)s|message:%(message)s",
+    handlers=[
+        logging.FileHandler(LOG_FILENAME),
+        logging.StreamHandler()
+    ])
+
+
 def get_areas():
     res = requests.get('https://api.hh.ru/areas', headers=HEADERS)
     with open(f"{str(datetime.utcnow()).replace(':', '').replace('-', '').replace('.', '')}_areas.txt",
@@ -150,9 +159,6 @@ def create_index(indexname: str):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format=LOGGER_STR_FORMAT,
-                        level=LOGGER_LEVEL,
-                        filename=LOG_FILENAME)
     logging.info('Starting vds...')
     get_areas()
     get_specializations()
